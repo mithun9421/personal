@@ -1,0 +1,168 @@
+ import java.io.*;
+ import java.util.*;
+ import java.util.ResourceBundle;
+ import java.sql.*;
+ class Main
+ {
+    public static void main(String args[]) throws Exception
+    {
+        int insflag = 0;
+        BufferedReader br = new BufferedReader (new InputStreamReader (System.in));
+        ResourceBundle rb = ResourceBundle.getBundle("mysql");
+        String url = rb.getString("db.url");
+        String username = rb.getString("db.username");
+        String password = rb.getString("db.password");
+        
+          Connection con = null;
+        //Connection Esatablishment
+       try
+          {  
+            Class.forName("com.mysql.jdbc.Driver");  
+            con=DriverManager.getConnection(url,username,password);
+          }
+          catch(Exception e)
+          {
+              e.printStackTrace();
+          }
+          int choice = 1;
+          do{
+          System.out.print("Enter your choice\n1)List Customer Details\n2)List Address Details\n3)Insert Customer Details\n4)Exit");
+          choice = Integer.parseInt(br.readLine());
+          switch(choice)
+          {
+              case 1:   Statement stmt = con.createStatement();
+                        ResultSet rs = stmt.executeQuery("select * from customer");
+                        if (!rs.isBeforeFirst() ) 
+                       {
+                            System.out.println("The table is Empty");
+                       }
+                        else
+                        {
+                             System.out.print(String.format("%-20s %-20s %-20s %-20s\n", "FirstName", "LastName", "Email", "PhoneNumber"));
+                             
+                            while(rs.next())
+                            {
+                                System.out.printf("%-20s %-20s %-20s %-20s\n", rs.getString(3), rs.getString(4) , rs.getString(5), rs.getString(6));
+                            }
+                        }
+                        break;
+              case 2:  stmt = con.createStatement();
+                        rs = stmt.executeQuery("select * from address");
+                        if(!rs.isBeforeFirst())
+                        {
+                            System.out.println("The table is Empty");
+                            
+                        }
+                        else
+                        {
+                            System.out.print(String.format("%-20s %-20s %-20s %-20s %-20s\n", "Line 1", "Line 2", "City", "Postal Code","State"));
+                            while(rs.next())
+                            {
+                                System.out.printf("%-20s %-20s %-20s %-20s %-20s\n",rs.getString(2),rs.getString(3),rs.getString(4),rs.getString(5),rs.getString(6));
+                            }
+                        }
+                        break;
+                        
+              case 3:  try{
+                        stmt = null;
+                        rs = null;
+                        int id = 0;
+                       System.out.print("Mention the details to insert\nEnter the First Name");
+                       String fname = br.readLine();
+                       System.out.println("Enter the Last Name");
+                       String lname = br.readLine();
+                       System.out.println("Enter the Email");
+                       String email = br.readLine();
+                       System.out.println("Enter the Address\nEnter the Line1");
+                       String line1 = br.readLine();
+                       System.out.println("Enter the Line2");
+                       String line2 = br.readLine();
+                       System.out.println("Enter the City");
+                       String city = br.readLine();
+                       System.out.println("Enter the Postal Code");
+                       int pCode = Integer.parseInt(br.readLine());
+                       System.out.println("Enter the State");
+                       String state = br.readLine();
+                       System.out.println("Enter the Country");
+                       String country = br.readLine();
+                       System.out.println("Enter the Mobile Number");
+                       String phoneNumber = (br.readLine());
+                       if(insflag == 0)
+                       {
+                           id = 1;
+                       }
+                       else
+                       {
+                        rs = stmt.executeQuery("select max(id) from customer");
+                       while(rs.isBeforeFirst())
+                            id = Integer.parseInt(rs.getString(1));
+                       }
+                       String query = "insert into customer (id,first_name, last_name, email, mobile_number)" + " values (?, ?, ?, ?, ?)";
+                       PreparedStatement ps = con.prepareStatement(query);
+                       ps.setInt(1,id);
+                       ps.setString(2,fname);
+                       ps.setString(3,lname);
+                       ps.setString(4,email);
+                       ps.setString(5,phoneNumber);
+                       ps.execute();
+                       if(insflag == 0)
+                       {
+                           id = 1;
+                           insflag++;
+                       }
+                       else
+                       {
+                       rs = stmt.executeQuery("select max(id) from address");
+                       while(rs.isBeforeFirst())
+                            id = Integer.parseInt(rs.getString(1));
+                       }
+                       query = "insert into address (id,line1,line2,city,postal_code,state,country)" + "values(?,?,?,?,?,?)";
+                       ps = con.prepareStatement(query);
+                       ps.setInt(1,id);
+                       ps.setString(2,line1);
+                       ps.setString(3,line2);
+                       ps.setString(4,city);
+                       ps.setLong(5,pCode);
+                       ps.setString(6,state);
+                       ps.setString(7,country);
+                       ps.execute();
+                        rs = stmt.getGeneratedKeys();
+
+                       System.out.println("Data inserted Successfully!!!");
+                        }
+                        catch(Exception e){
+                            e.printStackTrace();
+                        }
+                                     break;
+
+              case 4: return;
+//                  Mention the details to insert
+//Enter the First Name
+//Madhan
+//Enter the Last Name
+//Kumar
+//Enter the Email
+//madhan@mail.in
+//Enter the Address
+//Enter the Line1
+//3/15c
+//Enter the Line2
+//LGardens
+//Enter the City
+//Coimbatore
+//Enter the Postal Code
+//641110
+//Enter the State
+//Tamilnadu
+//Enter the Country
+//India
+//Enter the Mobile Number
+//9597390580
+//Data inserted Successfully!!!
+          }
+          
+          }while((choice > 0 ) && (choice < 5));
+
+    }
+
+ }
